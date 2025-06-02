@@ -47,7 +47,7 @@ pub fn calc_next_block_base_fee(
     // Calculate the target gas by dividing the gas limit by the elasticity multiplier.
     let gas_target = gas_limit / base_fee_params.elasticity_multiplier as u64;
 
-    match gas_used.cmp(&gas_target) {
+    let next_base_fee = match gas_used.cmp(&gas_target) {
         // If the gas used in the current block is equal to the gas target, the base fee remains the
         // same (no increase).
         core::cmp::Ordering::Equal => base_fee,
@@ -73,7 +73,8 @@ pub fn calc_next_block_base_fee(
                     as u64,
             )
         }
-    }
+    };
+    core::cmp::max(next_base_fee, base_fee_params.minimum_base_fee as u64)
 }
 
 /// Calculate the gas limit for the next block based on parent and desired gas limits.

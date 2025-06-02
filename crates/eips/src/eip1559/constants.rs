@@ -36,6 +36,12 @@ pub const DEFAULT_BASE_FEE_MAX_CHANGE_DENOMINATOR: u64 = 8;
 /// Elasticity multiplier as defined in [EIP-1559](https://eips.ethereum.org/EIPS/eip-1559)
 pub const DEFAULT_ELASTICITY_MULTIPLIER: u64 = 2;
 
+/// Base fee max change denominator for Berachain as defined in BRIP-0002
+pub(crate) const BERACHAIN_DEFAULT_BASE_FEE_MAX_CHANGE_DENOMINATOR: u128 = 48;
+
+/// The minimum base fee in wei for Berachain as defined in BRIP-0002
+pub(crate) const BERACHAIN_DEFAULT_MINIMUM_BASE_FEE: u128 = 10_000_000_000;
+
 /// Base fee max change denominator for Optimism Sepolia as defined in the Optimism
 /// [transaction costs](https://docs.optimism.io/stack/differences#transactions) doc.
 pub(crate) const OP_SEPOLIA_EIP1559_DEFAULT_BASE_FEE_MAX_CHANGE_DENOMINATOR: u128 = 50;
