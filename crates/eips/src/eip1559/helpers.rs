@@ -90,10 +90,8 @@ pub fn calculate_block_gas_limit(parent_gas_limit: u64, desired_gas_limit: u64) 
 mod tests {
     use super::*;
     use crate::eip1559::constants::{
-        BERACHAIN_DEFAULT_MINIMUM_BASE_FEE,
         ETHEREUM_BLOCK_GAS_LIMIT_30M,
         MIN_PROTOCOL_BASE_FEE, MIN_PROTOCOL_BASE_FEE_U256,
-        BERACHAIN_DEFAULT_BASE_FEE_MAX_CHANGE_DENOMINATOR,
         DEFAULT_ELASTICITY_MULTIPLIER
     };
 
@@ -262,60 +260,56 @@ mod tests {
         }
     }
 
-    #[test]
-    fn test_berachain_base_fee_params() {
-        let params = BaseFeeParams::berachain();
-        assert_eq!(params.minimum_base_fee, BERACHAIN_DEFAULT_MINIMUM_BASE_FEE);
-        assert_eq!(params.max_change_denominator, BERACHAIN_DEFAULT_BASE_FEE_MAX_CHANGE_DENOMINATOR);
-        assert_eq!(params.elasticity_multiplier, DEFAULT_ELASTICITY_MULTIPLIER as u128);
-    }
 
     #[test]
     fn test_berachain_base_fee_respects_minimum() {
-        let params = BaseFeeParams::berachain();
+        const BERACHAIN_MINIMUM_BASE_FEE: u128 = 10_000_000_000;
+        let params = BaseFeeParams::new(48, DEFAULT_ELASTICITY_MULTIPLIER as u128, BERACHAIN_MINIMUM_BASE_FEE);
         let gas_limit = ETHEREUM_BLOCK_GAS_LIMIT_30M;
         let gas_target = gas_limit / params.elasticity_multiplier as u64;
 
         // Test case 1: When base fee would naturally decrease below minimum
-        let base_fee = BERACHAIN_DEFAULT_MINIMUM_BASE_FEE as u64;
+        let base_fee = BERACHAIN_MINIMUM_BASE_FEE as u64;
         let gas_used = gas_target / 2; // Using half the target to force decrease
         let next_fee = params.next_block_base_fee(gas_used, gas_limit, base_fee);
         assert_eq!(
             next_fee,
-            BERACHAIN_DEFAULT_MINIMUM_BASE_FEE as u64,
+            BERACHAIN_MINIMUM_BASE_FEE as u64,
             "Base fee should not go below minimum even when usage is low"
         );
 
         // Test case 2: When base fee would naturally stay above minimum
-        let base_fee = (BERACHAIN_DEFAULT_MINIMUM_BASE_FEE as u64) * 2;
+        let base_fee = (BERACHAIN_MINIMUM_BASE_FEE as u64) * 2;
         let gas_used = gas_target * 2; // Using double the target to force increase
         let next_fee = params.next_block_base_fee(gas_used, gas_limit, base_fee);
         assert!(
-            next_fee > BERACHAIN_DEFAULT_MINIMUM_BASE_FEE as u64,
+            next_fee > BERACHAIN_MINIMUM_BASE_FEE as u64,
             "Base fee should be allowed to increase above minimum"
         );
 
         // Test case 3: When starting below minimum
-        let base_fee = (BERACHAIN_DEFAULT_MINIMUM_BASE_FEE as u64) / 2;
+        let base_fee = (BERACHAIN_MINIMUM_BASE_FEE as u64) / 2;
         let gas_used = gas_target; // Using target (neutral case)
         let next_fee = params.next_block_base_fee(gas_used, gas_limit, base_fee);
         assert_eq!(
             next_fee,
-            BERACHAIN_DEFAULT_MINIMUM_BASE_FEE as u64,
+            BERACHAIN_MINIMUM_BASE_FEE as u64,
             "Base fee should be raised to minimum when starting below"
         );
     }
 
     #[test]
     fn test_berachain_base_fee_edge_cases() {
-        let params = BaseFeeParams::berachain();
+        const BERACHAIN_MINIMUM_BASE_FEE: u128 = 10_000_000_000;
+        let params = BaseFeeParams::new(48, DEFAULT_ELASTICITY_MULTIPLIER as u128, BERACHAIN_MINIMUM_BASE_FEE);
+
         let gas_limit = ETHEREUM_BLOCK_GAS_LIMIT_30M;
 
         // Test with zero gas used
-        let next_fee = params.next_block_base_fee(0, gas_limit, BERACHAIN_DEFAULT_MINIMUM_BASE_FEE as u64);
+        let next_fee = params.next_block_base_fee(0, gas_limit, BERACHAIN_MINIMUM_BASE_FEE as u64);
         assert_eq!(
             next_fee,
-            BERACHAIN_DEFAULT_MINIMUM_BASE_FEE as u64,
+            BERACHAIN_MINIMUM_BASE_FEE as u64,
             "Should maintain minimum base fee even with zero gas used"
         );
 
@@ -323,25 +317,27 @@ mod tests {
         let next_fee = params.next_block_base_fee(
             gas_limit,
             gas_limit,
-            BERACHAIN_DEFAULT_MINIMUM_BASE_FEE as u64,
+            BERACHAIN_MINIMUM_BASE_FEE as u64,
         );
         assert!(
-            next_fee > BERACHAIN_DEFAULT_MINIMUM_BASE_FEE as u64,
+            next_fee > BERACHAIN_MINIMUM_BASE_FEE as u64,
             "Should increase above minimum base fee when gas limit is fully used"
         );
     }
 
     #[test]
     fn test_berachain_base_fee_transitions() {
-        let params = BaseFeeParams::berachain();
+        const BERACHAIN_MINIMUM_BASE_FEE: u128 = 10_000_000_000;
+        let params = BaseFeeParams::new(48, DEFAULT_ELASTICITY_MULTIPLIER as u128, BERACHAIN_MINIMUM_BASE_FEE);
+
         let gas_limit = ETHEREUM_BLOCK_GAS_LIMIT_30M;
         let gas_target = gas_limit / params.elasticity_multiplier as u64;
 
         // Start at minimum, then increase usage to check transition above minimum
-        let mut current_fee = BERACHAIN_DEFAULT_MINIMUM_BASE_FEE as u64;
+        let mut current_fee = BERACHAIN_MINIMUM_BASE_FEE as u64;
         current_fee = params.next_block_base_fee(gas_target * 2, gas_limit, current_fee);
         assert!(
-            current_fee > BERACHAIN_DEFAULT_MINIMUM_BASE_FEE as u64,
+            current_fee > BERACHAIN_MINIMUM_BASE_FEE as u64,
             "Fee should increase above minimum with high usage"
         );
 
@@ -353,7 +349,7 @@ mod tests {
         }
         assert_eq!(
             current_fee,
-            BERACHAIN_DEFAULT_MINIMUM_BASE_FEE as u64,
+            BERACHAIN_MINIMUM_BASE_FEE as u64,
             "Fee should eventually return to minimum with sustained low usage"
         );
     }

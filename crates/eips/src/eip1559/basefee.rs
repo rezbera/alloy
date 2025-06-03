@@ -9,8 +9,6 @@ use crate::{
         OP_SEPOLIA_EIP1559_BASE_FEE_MAX_CHANGE_DENOMINATOR_CANYON,
         OP_SEPOLIA_EIP1559_DEFAULT_BASE_FEE_MAX_CHANGE_DENOMINATOR,
         OP_SEPOLIA_EIP1559_DEFAULT_ELASTICITY_MULTIPLIER,
-        BERACHAIN_DEFAULT_BASE_FEE_MAX_CHANGE_DENOMINATOR,
-        BERACHAIN_DEFAULT_MINIMUM_BASE_FEE
     },
 };
 
@@ -99,16 +97,6 @@ impl BaseFeeParams {
             minimum_base_fee: 0,
         }
     }
-
-    /// Get the base fee parameters for Berachain.
-    pub const fn berachain() -> Self {
-        Self {
-            max_change_denominator: BERACHAIN_DEFAULT_BASE_FEE_MAX_CHANGE_DENOMINATOR,
-            elasticity_multiplier: DEFAULT_ELASTICITY_MULTIPLIER as u128,
-            minimum_base_fee: BERACHAIN_DEFAULT_MINIMUM_BASE_FEE,
-        }
-    }
-
 
     /// Calculate the base fee for the next block based on the EIP-1559 specification.
     ///
