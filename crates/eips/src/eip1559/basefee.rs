@@ -23,12 +23,16 @@ pub struct BaseFeeParams {
     /// The elasticity multiplier from EIP-1559
     #[cfg_attr(feature = "serde", serde(with = "alloy_serde::quantity"))]
     pub elasticity_multiplier: u128,
+
+    /// The minimum base fee for the chain. Introduced on Berachain with BRIP-0002
+    #[cfg_attr(feature = "serde", serde(with = "alloy_serde::quantity"))]
+    pub minimum_base_fee: u128,
 }
 
 impl BaseFeeParams {
     /// Create a new BaseFeeParams
-    pub const fn new(max_change_denominator: u128, elasticity_multiplier: u128) -> Self {
-        Self { max_change_denominator, elasticity_multiplier }
+    pub const fn new(max_change_denominator: u128, elasticity_multiplier: u128, minimum_base_fee: u128) -> Self {
+        Self { max_change_denominator, elasticity_multiplier, minimum_base_fee }
     }
 
     /// Get the base fee parameters for Ethereum mainnet
@@ -36,6 +40,7 @@ impl BaseFeeParams {
         Self {
             max_change_denominator: DEFAULT_BASE_FEE_MAX_CHANGE_DENOMINATOR as u128,
             elasticity_multiplier: DEFAULT_ELASTICITY_MULTIPLIER as u128,
+            minimum_base_fee: 0,
         }
     }
 
@@ -44,6 +49,7 @@ impl BaseFeeParams {
         Self {
             max_change_denominator: OP_MAINNET_EIP1559_DEFAULT_BASE_FEE_MAX_CHANGE_DENOMINATOR,
             elasticity_multiplier: OP_MAINNET_EIP1559_DEFAULT_ELASTICITY_MULTIPLIER,
+            minimum_base_fee: 0,
         }
     }
 
@@ -52,6 +58,7 @@ impl BaseFeeParams {
         Self {
             max_change_denominator: OP_MAINNET_EIP1559_BASE_FEE_MAX_CHANGE_DENOMINATOR_CANYON,
             elasticity_multiplier: OP_MAINNET_EIP1559_DEFAULT_ELASTICITY_MULTIPLIER,
+            minimum_base_fee: 0,
         }
     }
 
@@ -60,6 +67,7 @@ impl BaseFeeParams {
         Self {
             max_change_denominator: OP_SEPOLIA_EIP1559_DEFAULT_BASE_FEE_MAX_CHANGE_DENOMINATOR,
             elasticity_multiplier: OP_SEPOLIA_EIP1559_DEFAULT_ELASTICITY_MULTIPLIER,
+            minimum_base_fee: 0,
         }
     }
 
@@ -68,6 +76,7 @@ impl BaseFeeParams {
         Self {
             max_change_denominator: OP_SEPOLIA_EIP1559_BASE_FEE_MAX_CHANGE_DENOMINATOR_CANYON,
             elasticity_multiplier: OP_SEPOLIA_EIP1559_DEFAULT_ELASTICITY_MULTIPLIER,
+            minimum_base_fee: 0,
         }
     }
 
@@ -76,6 +85,7 @@ impl BaseFeeParams {
         Self {
             max_change_denominator: OP_SEPOLIA_EIP1559_DEFAULT_BASE_FEE_MAX_CHANGE_DENOMINATOR,
             elasticity_multiplier: BASE_SEPOLIA_EIP1559_DEFAULT_ELASTICITY_MULTIPLIER,
+            minimum_base_fee: 0,
         }
     }
 
@@ -84,6 +94,7 @@ impl BaseFeeParams {
         Self {
             max_change_denominator: OP_SEPOLIA_EIP1559_BASE_FEE_MAX_CHANGE_DENOMINATOR_CANYON,
             elasticity_multiplier: BASE_SEPOLIA_EIP1559_DEFAULT_ELASTICITY_MULTIPLIER,
+            minimum_base_fee: 0,
         }
     }
 
